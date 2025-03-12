@@ -92,7 +92,7 @@
 		{#each notes as note (note.id)}
 			<li class="rounded border p-4 shadow">
 				{#if editingId === note.id}
-					<form onsubmit={(e) => updateNote(e, note.id)} class="space-y-2">
+					<form onsubmit={() => updateNote(note.id)} class="space-y-2">
 						<input type="text" bind:value={editTitle} class="w-full rounded border p-2" required />
 						<textarea bind:value={editContent} class="w-full rounded border p-2" rows="4" required
 						></textarea>
