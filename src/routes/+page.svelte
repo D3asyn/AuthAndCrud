@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+
 	let notes = $state([]);
 	let title = $state('');
 	let content = $state('');
@@ -23,6 +24,7 @@
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ title, content })
 		});
+
 		if (res.ok) {
 			title = '';
 			content = '';
@@ -30,14 +32,11 @@
 		}
 	}
 
-	// Delete a note by its id
+	// Delete a note
 	async function deleteNote(id: number) {
-		const res = await fetch(`/api/notes/${id}`, {
-			method: 'DELETE'
-		});
-		if (res.ok) {
-			loadNotes();
-		}
+		const res = await fetch(`/api/notes/${id}`, { method: 'DELETE' });
+
+		if (res.ok) loadNotes();
 	}
 
 	// Prepare to edit a note
@@ -54,6 +53,7 @@
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ title: editTitle, content: editContent })
 		});
+
 		if (res.ok) {
 			editingId = null;
 			loadNotes();
@@ -62,50 +62,66 @@
 </script>
 
 <main class="mx-auto max-w-2xl p-4">
-	<h1 class="mb-4 text-3xl font-bold">My Notes</h1>
+	<h1 class="mb-4 text-center text-3xl font-bold">My Notes</h1>
 
-	<form onsubmit={addNote} class="mb-8 space-y-4">
-		<div>
-			<input
-				type="text"
-				bind:value={title}
-				placeholder="Title"
-				class="w-full rounded border p-2"
-				required
-			/>
-		</div>
-		<div>
-			<textarea
-				bind:value={content}
-				placeholder="Content"
-				class="w-full rounded border p-2"
-				rows="4"
-				required
-			></textarea>
-		</div>
-		<button type="submit" class="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600">
+	<!-- Add Note Form -->
+	<form onsubmit={addNote} class="mb-8 space-y-4 rounded-lg bg-gray-100 p-4 shadow">
+		<input
+			type="text"
+			bind:value={title}
+			placeholder="Title"
+			class="w-full rounded border p-2 focus:ring focus:ring-blue-300"
+			required
+		/>
+
+		<textarea
+			bind:value={content}
+			placeholder="Content"
+			class="w-full rounded border p-2 focus:ring focus:ring-blue-300"
+			rows="4"
+			required
+		></textarea>
+
+		<button
+			type="submit"
+			class="w-full rounded bg-blue-500 px-4 py-2 text-white transition hover:bg-blue-600"
+		>
 			Add Note
 		</button>
 	</form>
 
+	<!-- Notes List -->
 	<ul class="space-y-4">
 		{#each notes as note (note.id)}
-			<li class="rounded border p-4 shadow">
+			<li class="rounded border bg-white p-4 shadow">
 				{#if editingId === note.id}
+					<!-- Edit Note Form -->
 					<form onsubmit={() => updateNote(note.id)} class="space-y-2">
-						<input type="text" bind:value={editTitle} class="w-full rounded border p-2" required />
-						<textarea bind:value={editContent} class="w-full rounded border p-2" rows="4" required
+						<input
+							type="text"
+							bind:value={editTitle}
+							class="w-full rounded border p-2 focus:ring focus:ring-green-300"
+							required
+						/>
+
+						<textarea
+							bind:value={editContent}
+							class="w-full rounded border p-2 focus:ring focus:ring-green-300"
+							rows="4"
+							required
 						></textarea>
+
 						<div class="flex space-x-2">
 							<button
 								type="submit"
-								class="rounded bg-green-500 px-4 py-2 text-white hover:bg-green-600"
+								class="w-full rounded bg-green-500 px-4 py-2 text-white transition hover:bg-green-600"
 							>
 								Save
 							</button>
+
 							<button
 								type="button"
-								class="rounded bg-gray-500 px-4 py-2 text-white hover:bg-gray-600"
+								class="w-full rounded bg-gray-500 px-4 py-2 text-white transition hover:bg-gray-600"
 								onclick={() => (editingId = null)}
 							>
 								Cancel
@@ -113,17 +129,20 @@
 						</div>
 					</form>
 				{:else}
+					<!-- Note Display -->
 					<h2 class="text-xl font-semibold">{note.title}</h2>
-					<p>{note.content}</p>
+					<p class="text-gray-700">{note.content}</p>
+
 					<div class="mt-2 flex space-x-2">
 						<button
-							class="rounded bg-red-500 px-4 py-2 text-white hover:bg-red-600"
+							class="rounded bg-red-500 px-4 py-2 text-white transition hover:bg-red-600"
 							onclick={() => deleteNote(note.id)}
 						>
 							Delete
 						</button>
+
 						<button
-							class="rounded bg-yellow-500 px-4 py-2 text-white hover:bg-yellow-600"
+							class="rounded bg-yellow-500 px-4 py-2 text-white transition hover:bg-yellow-600"
 							onclick={() => startEditing(note)}
 						>
 							Edit
